@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maxwell Guico · Robotics Engineer</title>
+<meta name="description" content="Maxwell Guico, robotics engineer. Localisation, mapping and navigation on real robots, from ground rovers to micro-drones.">
+<meta property="og:title" content="Maxwell Guico · Robotics Engineer">
+<meta property="og:description" content="Localisation, mapping and navigation on real robots.">
+<style>
+@font-face{font-family:Geist;src:url(assets/Geist-Variable.woff2) format("woff2");font-weight:100 900;font-display:swap}
+
+/* ───────── Shared structure ───────── */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+a{color:inherit}
+img,video,svg{display:block;max-width:100%}
+h1,h2,h3,p{margin:0}
+[hidden]{display:none!important}
+.wrap{width:min(1120px,calc(100% - 48px));margin-inline:auto}
+.mono{font-family:var(--mono)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+.skip{position:fixed;left:1rem;top:-4rem;z-index:20;background:var(--bg);padding:.5rem .8rem;border:1px solid var(--accent)}
+.skip:focus{top:1rem}
+
+/* header */
+.head{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.head .wrap{display:flex;justify-content:space-between;align-items:center;height:60px}
+.brand{font-weight:700;letter-spacing:-.02em;text-decoration:none;display:flex;gap:10px;align-items:center}
+.brand i{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
+.nav{display:flex;gap:22px;font-size:.9rem;color:var(--muted)}
+.nav a{text-decoration:none}.nav a:hover{color:var(--accent)}
+
+/* hero */
+.hero{padding:88px 0 64px;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.hero h1{font-size:clamp(2.6rem,6.4vw,5rem);line-height:1;letter-spacing:-.05em;font-weight:760;margin:14px 0 22px}
+.hero h1 span{color:var(--muted)}
+.hero .lede{font-size:clamp(1.05rem,1.8vw,1.25rem);color:var(--muted);max-width:52ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;gap:8px;align-items:center;padding:11px 18px;border-radius:var(--radius);text-decoration:none;font-weight:600;font-size:.92rem;border:1px solid var(--line-strong);transition:.2s}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn:hover{transform:translateY(-1px);border-color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.stats div{padding:20px 18px;border-right:1px solid var(--line)}
+.stats div:last-child{border-right:0}
+.stats b{display:block;font-size:clamp(1.15rem,1.9vw,1.55rem);white-space:nowrap;letter-spacing:-.04em;line-height:1.1;color:var(--accent);font-variant-numeric:tabular-nums}
+.stats span{font-size:.8rem;color:var(--muted);line-height:1.35;display:block;margin-top:6px}
+.hero-side{display:flex;flex-direction:column;gap:14px}
+.hero-art{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--art)}
+
+/* sections */
+.sec{padding:56px 0}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:28px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.sec-head h2{font-size:clamp(1.6rem,3.2vw,2.2rem);letter-spacing:-.04em;line-height:1.1}
+.sec-head p{color:var(--muted);font-size:.92rem}
+
+/* project grid */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.card{display:flex;flex-direction:column;text-decoration:none;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);overflow:hidden;transition:.25s}
+.card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow)}
+.card .media{aspect-ratio:16/8.5;background:var(--art);overflow:hidden;position:relative}
+.card .media svg,.card .media img,.card .media video{width:100%;height:100%;object-fit:cover}
+.card .body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card .meta{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.card h3{font-size:1.35rem;letter-spacing:-.03em;line-height:1.2}
+.card p{color:var(--muted);font-size:.93rem}
+.card .result{margin-top:auto;padding-top:12px;border-top:1px dashed var(--line);display:flex;gap:10px;align-items:baseline;font-size:.86rem}
+.card .result b{color:var(--accent);font-size:1.15rem;letter-spacing:-.02em;white-space:nowrap}
+.card .num{display:none}
+.badge{position:absolute;top:12px;left:12px;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line-strong);color:var(--muted)}
+
+/* skills */
+.skills{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.skill{border-top:2px solid var(--accent);padding-top:14px}
+.skill h3{font-size:1rem;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--mono);font-size:.72rem;padding:4px 9px;border:1px solid var(--line);border-radius:99px;color:var(--muted);background:var(--surface)}
+
+/* contact */
+.contact{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:40px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.contact h2{font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.04em}
+.contact p{color:var(--muted);margin-top:6px}
+footer{padding:36px 0 48px;color:var(--muted);font-size:.8rem;display:flex;justify-content:space-between}
+
+/* ───────── Case study page ───────── */
+.case{padding:40px 0 72px}
+.case h1:focus{outline:none}
+.back{font-size:.9rem;color:var(--accent);text-decoration:none;font-weight:600}
+.case-hero{margin:26px 0 30px;max-width:820px}
+.case-hero h1{font-size:clamp(2.2rem,5.4vw,3.8rem);letter-spacing:-.05em;line-height:1.02;margin:12px 0 16px}
+.case-hero .lede{font-size:1.15rem;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);margin-bottom:34px}
+.facts div{padding:14px 16px;border-right:1px solid var(--line);min-width:0}
+.facts div:last-child{border-right:0}
+.facts dt{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.facts dd{margin:4px 0 0;font-size:.9rem;font-weight:560}
+.figure{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--art)}
+.figure svg,.figure img,.figure video{width:100%;max-height:480px;object-fit:contain}
+.caption{font-size:.78rem;color:var(--muted);margin:8px 0 0}
+.block{margin-top:56px}
+.block-label{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+.block-label .n{font-family:var(--mono);font-size:.75rem;color:var(--on-accent);background:var(--accent);border-radius:6px;padding:3px 8px}
+.block-label h2{font-size:1.7rem;letter-spacing:-.035em}
+.result-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:start}
+.result-text p{color:var(--muted);margin-bottom:12px}
+.result-text strong{color:var(--ink)}
+.metrics{display:grid;gap:12px}
+.metric{border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;background:var(--surface)}
+.metric b{display:block;font-size:2rem;letter-spacing:-.045em;line-height:1.05;color:var(--accent);font-variant-numeric:tabular-nums}
+.metric span{font-size:.85rem;color:var(--muted)}
+.pairs{display:grid;gap:14px}
+.pair{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.pair>div{padding:20px 22px}
+.pair .hard{border-right:1px solid var(--line)}
+.pair .tag{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:block}
+.pair .hard .tag{color:var(--warn)}
+.pair .how .tag{color:var(--accent)}
+.pair h3{font-size:1.08rem;letter-spacing:-.02em;margin-bottom:6px;line-height:1.3}
+.pair p{color:var(--muted);font-size:.93rem}
+.limits{border-left:3px solid var(--line-strong);padding:4px 0 4px 18px;color:var(--muted);font-size:.93rem;max-width:75ch}
+.limits li{margin:6px 0}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.case-nav{display:flex;justify-content:space-between;gap:16px;margin-top:64px;padding-top:24px;border-top:1px solid var(--line)}
+.case-nav a{text-decoration:none;max-width:48%}
+.case-nav small{display:block;font-family:var(--mono);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.case-nav span{font-weight:650;color:var(--accent)}
+.todo{border:1px dashed var(--warn);color:var(--warn);border-radius:var(--radius);padding:18px 20px;font-size:.93rem}
+
+/* ───────── THEME C: Editorial (white, big type, list layout) ───────── */
+html,html[data-theme]{color-scheme:light;--bg:#ffffff;--surface:#ffffff;--art:#f3f2ee;--ink:#111;--muted:#5d5d5d;--line:#e4e4e4;--line-strong:#bdbdbd;--accent:#e2531c;--on-accent:#fff;--warn:#b5381a;--radius:2px;--shadow:none;--sans:Geist,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+html .hero{grid-template-columns:1fr;padding-top:96px}
+html .hero h1{font-size:clamp(3rem,10vw,8rem);letter-spacing:-.065em;line-height:.92}
+html .hero-art{display:none}
+html .stats{border:0;border-top:1px solid var(--ink);border-radius:0}
+html .stats div{border-right:0;padding-left:0}
+html .stats b{color:var(--ink);font-size:2.6rem}
+html .grid{grid-template-columns:1fr;gap:0;border-top:1px solid var(--ink);counter-reset:p}
+html .card{flex-direction:row-reverse;border:0;border-bottom:1px solid var(--line);border-radius:0;align-items:center;gap:28px;padding:26px 0;counter-increment:p}
+html .card:hover{transform:none;background:#faf8f5}
+html .card .media{width:34%;flex:none;aspect-ratio:16/10}
+html .card .body{padding:0;gap:6px}
+html .card .num{display:block;font-family:var(--mono);font-size:.8rem;color:var(--accent)}
+html .card .num::before{content:"0" counter(p)}
+html .card h3{font-size:clamp(1.5rem,3vw,2.3rem);letter-spacing:-.045em}
+html .card .result{border-top:0;padding-top:4px;margin-top:6px}
+html .sec-head{border-bottom:0}
+html .sec-head h2{font-size:clamp(2rem,5vw,3.4rem)}
+html .skill{border-top:1px solid var(--ink)}
+html .contact{border:0;background:var(--ink);color:#fff}
+html .contact p{color:#bbb}
+html .contact .btn:not(.primary){color:#fff;border-color:#555}
+html .pair{border:0;border-top:1px solid var(--ink);border-radius:0}
+html .pair .hard{border-right:0}
+html .block-label .n{background:none;color:var(--accent);padding:0;font-size:1rem}
+html .metric{border:0;border-top:1px solid var(--ink);border-radius:0;padding-left:0}
+html .metric b{color:var(--ink)}
+html .facts{border:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);border-radius:0}
+html .facts div{border-right:0;padding-left:0}
+
+/* diagrams */
+.dg{width:100%;height:auto;display:block}
+.dg text{font-family:var(--mono);font-size:12px;fill:var(--muted)}
+.dg .h{font-family:var(--sans);font-size:15px;font-weight:650;fill:var(--ink)}
+.dg .b{fill:var(--ink);font-weight:600}
+.dg .s{font-size:11px}
+.dg .w{fill:#fff;font-weight:700;font-size:12px}
+.dg .acct{fill:var(--accent);font-weight:600}
+.dg .bgf{fill:var(--art)}
+.dg .inkf{fill:var(--ink)}
+.dg .accf{fill:var(--accent)}
+.dg .mutef{fill:var(--line-strong)}.dg .mutef2{fill:var(--muted);opacity:.5}
+.dg .maskf{fill:#111}
+.dg .px{fill:var(--muted)}
+.dg .z{fill:var(--accent)}
+.dg .cell{fill:none;stroke:var(--line-strong);stroke-width:.8}
+.dg .box{fill:var(--bg);stroke:var(--ink);stroke-width:1.2}
+.dg .boxa{fill:var(--bg);stroke:var(--accent);stroke-width:2}
+.dg .ink1{stroke:var(--ink);stroke-width:1.2;fill:none}
+.dg .ink1.bgf{fill:var(--art)}
+.dg .ink2{stroke:var(--ink);stroke-width:1.6;fill:none}
+.dg .ink3{stroke:var(--ink);stroke-width:3;fill:var(--bg)}
+.dg .wall{stroke:var(--ink);stroke-width:4;fill:none;stroke-linecap:square}
+.dg .w2{stroke:var(--accent);stroke-width:2;fill:none;stroke-dasharray:3 3}
+.dg .acc{stroke:var(--accent);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.dg .acc1{stroke:var(--accent);stroke-width:2;fill:color-mix(in srgb,var(--accent) 14%,transparent)}
+.dg .accd{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:5 4;fill:color-mix(in srgb,var(--accent) 8%,transparent)}
+.dg .dash{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:5 5;fill:none}
+.dg .dashm{stroke:var(--line-strong);stroke-width:2;stroke-dasharray:4 4;fill:none}
+.dg .loop{stroke:var(--accent);stroke-width:1.6;stroke-dasharray:6 4;fill:none}
+.dg .node{fill:var(--bg);stroke:var(--ink);stroke-width:1.6}
+.dg .wedge{fill:color-mix(in srgb,var(--accent) 10%,transparent);stroke:color-mix(in srgb,var(--accent) 40%,transparent)}
+.dg .ray{stroke:var(--accent);stroke-opacity:.35;stroke-width:1}
+.dg .board{stroke:var(--accent);stroke-width:5;stroke-linecap:round}
+.dg .wallc{fill:var(--ink)}
+.dg .hardc{fill:var(--ink);opacity:.35}
+.dg .softc{fill:var(--accent);opacity:.18}
+.dg .treel{stroke:var(--muted);stroke-width:.8;opacity:.6}
+.dg .warnc{fill:none;stroke:var(--warn);stroke-width:2;stroke-dasharray:3 3}
+.dg .hb{stroke:var(--ink);stroke-width:1.2}
+.dg .hatchl{stroke:var(--ink);stroke-width:1.2;opacity:.6}
+.video{margin:0 0 22px}
+.video video{width:100%;border-radius:var(--radius);background:#000;display:block}
+.pair .mine{display:inline-block;margin-left:8px;font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--on-accent);background:var(--accent);padding:2px 6px;border-radius:3px;vertical-align:middle}
+.figure .dg{max-height:none}
+
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;margin:0 0 16px}
+.figs:not(:has(figure:not([hidden]))){display:none}
+.fig-real{margin:0;background:var(--art)}
+.fig-real img{width:100%;height:auto;display:block}
+.fig-real .caption{padding:8px 12px;margin:0}
+
+/* galleries */
+.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.gallery figure{margin:0;background:var(--art);border:1px solid var(--line);display:flex;flex-direction:column}
+.gallery figure:first-child{grid-column:1/-1}
+.gallery img{width:100%;height:200px;object-fit:contain;cursor:zoom-in;background:#fff}
+.gallery figure:first-child img{height:auto;max-height:520px}
+.gallery.wide figure{grid-column:1/-1}
+.gallery.wide img{height:auto;max-height:620px}
+.gallery figcaption,.vids figcaption{font-size:.8rem;color:var(--muted);padding:8px 12px}
+.vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;margin:0 0 22px}
+.vids figure{margin:0}
+.vids video{width:100%;background:#000;display:block}
+.card .media img{background:#fff;object-fit:contain}
+.lightbox{position:fixed;inset:0;z-index:60;background:#000d;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+.lightbox img{max-width:100%;max-height:85vh;background:#fff}
+.lightbox p{color:#ddd;font-size:.9rem;margin-top:12px;text-align:center}
+@media (max-width:600px){.gallery{grid-template-columns:1fr 1fr}.gallery img{height:140px}}
+
+/* responsive */
+@media (max-width:860px){
+ .hero{grid-template-columns:1fr;padding:56px 0 40px}
+ .grid{grid-template-columns:1fr}
+ .skills{grid-template-columns:repeat(2,1fr)}
+ .facts{grid-template-columns:1fr}
+ .facts div{border-right:0;border-bottom:1px solid var(--line)}
+ .result-grid,.pair{grid-template-columns:1fr}
+ .pair .hard{border-right:0;border-bottom:1px solid var(--line)}
+ .contact{flex-direction:column;align-items:start;padding:28px}
+ html .card{flex-direction:column;align-items:stretch}
+ html .card .media{width:100%}
+}
+@media (max-width:520px){
+ .wrap{width:calc(100% - 32px)}
+ .nav{gap:14px;font-size:.82rem}
+ .stats{grid-template-columns:1fr}.stats div{border-right:0;border-bottom:1px solid var(--line)}
+ .skills{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+
+<header class="head"><div class="wrap">
+  <a class="brand" href="#"><i></i>Maxwell Guico</a>
+  <nav class="nav" aria-label="Main"><a href="#work">Work</a><a href="#skills">Skills</a><a href="#contact">Contact</a></nav>
+</div></header>
+
+<main id="main" class="wrap">
+  <!-- HOME -->
+  <div id="home">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Robotics engineer · Singapore</p>
+        <h1>Maxwell Guico</h1>
+        <p class="lede">I make robots. Currently, my interest lies in multi-agent swarm robotics!</p>
+        <div class="cta">
+          <a class="btn primary" href="#work">See projects ↓</a>
+          <a class="btn" href="https://github.com/MaxwellGuico" rel="me">GitHub ↗</a>
+          <a class="btn" href="https://sg.linkedin.com/in/maxwell-guico" rel="me">LinkedIn ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="work">
+      <div class="sec-head"><h2>Selected work</h2><p>Each project: the result, what was hard, how it was solved.</p></div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <section class="sec" id="skills">
+      <div class="sec-head"><h2>Toolbox</h2></div>
+      <div class="skills">
+        <div class="skill"><h3>Robotics software</h3><div class="chips"><span class="chip">ROS 2 Jazzy</span><span class="chip">Nav2</span><span class="chip">Gazebo</span><span class="chip">PX4</span><span class="chip">MAVLink</span><span class="chip">Behaviour trees</span></div></div>
+        <div class="skill"><h3>State estimation</h3><div class="chips"><span class="chip">AMCL</span><span class="chip">EKF</span><span class="chip">Cartographer</span><span class="chip">Pose-graph SLAM</span><span class="chip">Scan matching</span></div></div>
+        <div class="skill"><h3>Planning &amp; control</h3><div class="chips"><span class="chip">A*</span><span class="chip">Pure pursuit</span><span class="chip">PID / PI</span><span class="chip">State machines</span></div></div>
+        <div class="skill"><h3>Build &amp; test</h3><div class="chips"><span class="chip">Python</span><span class="chip">C / C++</span><span class="chip">ESP-IDF</span><span class="chip">PyTorch</span><span class="chip">Linux</span><span class="chip">rosbag</span><span class="chip">Git</span></div></div>
+      </div>
+    </section>
+
+    <section class="sec" id="contact">
+      <div class="contact">
+        <div><h2>Let’s build something that moves.</h2><p>Open to robotics internships, research and engineering roles.</p></div>
+        <div class="cta" style="margin:0">
+          <a class="btn primary" href="https://sg.linkedin.com/in/maxwell-guico" rel="me">Message on LinkedIn</a>
+          <a class="btn" href="https://github.com/MaxwellGuico" rel="me">GitHub</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- CASE STUDY -->
+  <div id="case" hidden></div>
+</main>
+
+<div class="wrap"><footer><span>© Maxwell Guico</span><a href="#">Back to top ↑</a></footer></div>
+
+
+<script>
+/* Project diagrams — drawn from each project's repository.
+   Colours come from the page's CSS variables, so they follow the theme. */
+'use strict';
+const DG = (() => {
+  const W = 900, H = 460;
+  const t = (x, y, s, c = '', a = '') => `<text x="${x}" y="${y}" class="${c}" ${a}>${s}</text>`;
+  let uid = 0;
+  const svg = (body, label) => { const u = ++uid; body = body.replace(/(id="|url\(#)(ara|ar|hx|rc)\b/g, `$1$2${u}`); return `<svg class="dg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${label}"><rect width="${W}" height="${H}" class="bgf"/>${body}</svg>`; };
+  const box = (x, y, w, h, title, lines = [], acc = false) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" class="${acc ? 'boxa' : 'box'}"/>` +
+    t(x + 10, y + 20, title, 'b') + lines.map((l, i) => t(x + 10, y + 38 + i * 15, l, 's')).join('');
+  const arrowDefs = `<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" class="inkf"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" class="accf"/></marker><pattern id="hx" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0v6" class="hatchl"/></pattern></defs>`;
+  const tag = (x, y, s = 14, cls = 'inkf') => `<rect x="${x - s / 2}" y="${y - s / 2}" width="${s}" height="${s}" class="${cls}"/><rect x="${x - s / 4}" y="${y - s / 4}" width="${s / 2}" height="${s / 2}" class="bgf"/>`;
+  let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+  /* ── RB3302 Wave Rover ── */
+  function waveRover() {
+    const x0 = 40, y0 = 62, c = 70; let g = '';
+    for (let r = 0; r < 4; r++) for (let k = 0; k < 6; k++) {
+      const L = String.fromCharCode(65 + r * 6 + k);
+      g += `<rect x="${x0 + k * c}" y="${y0 + r * c}" width="${c}" height="${c}" class="cell"/>` + t(x0 + k * c + 6, y0 + r * c + 15, L, 's');
+    }
+    const ctr = (r, k) => [x0 + k * c + c / 2, y0 + r * c + c / 2];
+    const S = ctr(3, 0), T1 = ctr(1, 1), T2 = ctr(0, 3), T3 = ctr(2, 5), T4 = ctr(3, 4);
+    const tgt = [[T1, 1], [T2, 2], [T3, 3], [T4, 4]].map(([p, n]) => `<circle cx="${p[0]}" cy="${p[1]}" r="13" class="accf"/>` + t(p[0], p[1] + 4, n, 'w', 'text-anchor="middle"')).join('');
+    const obs = `<rect x="${x0 + 4 * c + 12}" y="${y0 + c + 14}" width="46" height="42" style="fill:url(#hx)" class="hb"/><rect x="${x0 + 2 * c + 14}" y="${y0 + 2 * c + 18}" width="40" height="36" style="fill:url(#hx)" class="hb"/>`;
+    const path = `<path d="M${S} L${T1} L${T2} Q${x0 + 6 * c - 4} ${y0 + 20} ${T3} L${T4}" class="acc" marker-end="url(#ara)"/>`;
+    const start = `<rect x="${S[0] - 9}" y="${S[1] - 9}" width="18" height="18" class="inkf"/>` + t(S[0] + 14, S[1] + 26, 'start', 's');
+    // arrival funnel
+    const cx = 690, cy = 180;
+    const funnel =
+      `<circle cx="${cx}" cy="${cy}" r="112" class="dash"/><circle cx="${cx}" cy="${cy}" r="24" class="acc1"/><path d="M${cx - 6} ${cy}h12M${cx} ${cy - 6}v12" class="ink1"/>` +
+      `<path d="M540 110 Q570 100 ${cx - 79} ${cy - 79}" class="ink2"/>` +
+      `<path d="M${cx - 79} ${cy - 79} L${cx - 44} ${cy - 50} L${cx - 22} ${cy - 22} L${cx - 9} ${cy - 6}" class="acc" marker-end="url(#ara)"/>` +
+      [[-4, -3], [3, 2], [-2, 4], [4, -4], [0, 0]].map(([a, b]) => `<circle cx="${cx + a}" cy="${cy + b}" r="2.6" class="inkf"/>`).join('') +
+      t(cx + 116, cy - 70, '10 cm', 'b', 'text-anchor="end"') + t(cx + 116, cy - 55, 'Nav2 hands over', '', 'text-anchor="end"') +
+      t(cx + 30, cy + 40, '2 cm', 'b') + t(cx + 30, cy + 55, 'confirm radius', '') +
+      t(560, 330, '① Approach  Nav2 drives to within 10 cm', '') +
+      t(560, 348, '② Refine    short moves, fresh pose each step', '') +
+      t(560, 366, '③ Confirm   settle, then 5 AMCL readings agree', '');
+    // pipeline
+    const steps = [['Cartographer', 'map'], ['EKF', 'wheel + IMU'], ['AMCL', 'localise'], ['Nav2', 'A* + RPP'], ['Behaviour tree', 'keep detours'], ['Precision', 'arrival']];
+    const pipe = steps.map((s, i) => box(40 + i * 140, 396, 124, 52, s[0], [s[1]], i > 3) + (i < 5 ? `<path d="M${164 + i * 140} 422h14" class="ink1" marker-end="url(#ar)"/>` : '')).join('');
+    return svg(arrowDefs + t(40, 40, '6 × 4 grid, cells A–X: visit four cells in order', 'h') + t(520, 40, 'Arriving at a cell', 'h') + g + obs + path + start + tgt + funnel +
+      `<rect x="${x0}" y="${y0 + 4 * c + 12}" width="14" height="12" style="fill:url(#hx)" class="hb"/>` + t(x0 + 22, y0 + 4 * c + 22, 'obstacle not in the saved map', 's') + pipe,
+      'Wave Rover: grid of lettered cells with a planned route around unmapped obstacles, and the three-stage precision arrival');
+  }
+
+  /* ── CDE1302 AprilTag drone ── */
+  function drone() {
+    const s = 72, ox = 70, oy = 222, P = (x, y) => [ox + x * s, oy + y * s];
+    const [ax, ay] = P(0, -1.575), area = `<rect x="${ax}" y="${ay}" width="${3.6 * s}" height="${3.15 * s}" class="ink2"/>`;
+    const lanes = [-1.15, -0.4, 0.35, 1.1].map(y => oy + y * s), L0 = ox + 0.35 * s, L1 = ox + 3.25 * s;
+    let d = `M${ox} ${oy} L${L0} ${lanes[0]}`;
+    lanes.forEach((y, i) => { const a = i % 2 ? L0 : L1, b = i % 2 ? L1 : L0; d += ` L${a} ${y}`; if (i < 3) { const r = (lanes[i + 1] - y) / 2; d += ` A${r} ${r} 0 0 ${i % 2 ? 0 : 1} ${a} ${lanes[i + 1]}`; } });
+    d += ` L${ox + 0.5 * s} ${oy + 0.15 * s}`;
+    const pad = `<rect x="${ox - 0.45 * s}" y="${oy - 0.45 * s}" width="${0.9 * s}" height="${0.9 * s}" class="accd"/>` + t(ox - 0.45 * s, oy + 0.45 * s + 14, '0.9 m landing box', 's');
+    const known = [[0.75, 0, '23 home'], [2, 1, '1'], [2, -1, '7']].map(([x, y, n]) => { const [px, py] = P(x, y); return tag(px, py) + t(px + 11, py + 4, n, 's'); }).join('');
+    const tw = P(3.6, 0); const t28 = tag(tw[0] + 14, tw[1]) + t(tw[0] + 24, tw[1] - 10, '28', 's');
+    const targets = [[1.3, -0.75], [2.9, 0.6], [1.0, 0.8]].map(([x, y]) => { const [px, py] = P(x, y); return tag(px, py, 14, 'accf') + t(px, py + 24, '?', 'acct', 'text-anchor="middle"'); }).join('');
+    const axes = `<path d="M${ox} ${oy + 1.75 * s}h40" class="ink1" marker-end="url(#ar)"/><path d="M${ox} ${oy + 1.75 * s}v28" class="ink1" marker-end="url(#ar)"/>` + t(ox + 46, oy + 1.75 * s + 4, 'x ahead', 's') + t(ox + 6, oy + 1.75 * s + 40, 'y right', 's');
+    const left = area + `<path d="${d}" class="acc" marker-end="url(#ara)"/>` + pad + known + t28 + targets + axes +
+      t(40, 40, 'Search area · 3.6 × 3.15 m · no GPS', 'h') +
+      tag(48, 432, 10) + t(60, 436, 'known tags', 's') + tag(150, 432, 10, 'accf') + t(162, 436, 'targets, positions unknown', 's') + `<path d="M330 432h22" class="acc"/>` + t(358, 436, 'search lanes', 's');
+    const R = 440;
+    const right = t(R, 40, 'What runs where', 'h') +
+      box(R, 60, 134, 100, 'PX4', ['optical flow +', 'range → EKF2', 'flies set-points']) +
+      box(R + 152, 60, 134, 100, 'ESP32-S3', ['set-point/50 ms', 'MAVLink bridge', 'camera + Wi-Fi']) +
+      box(R + 304, 60, 134, 100, 'Laptop', ['search path', 'tag detector', 'PI loop · 5 Hz', 'pose-graph map'], true) +
+      `<path d="M${R + 136} 100h14" class="ink1" marker-start="url(#ar)" marker-end="url(#ar)"/>` + t(R + 90, 182, 'UART MAVLink', 's') +
+      `<path d="M${R + 288} 92h14" class="ink1" marker-end="url(#ar)"/><path d="M${R + 302} 126h-14" class="ink1" marker-end="url(#ar)"/>` + t(R + 262, 182, 'Wi-Fi UDP', 's') +
+      t(R, 228, 'Fighting drift in three places', 'h') +
+      [['In flight', 'PI loop nudges', 'drone onto lane'], ['Before landing', 'home tag 23', 'measures drift'], ['After landing ★', 'pose graph fits', 'poses + tags']]
+        .map((c, i) => box(R + i * 152, 244, 134, 72, c[0], [c[1], c[2]], i === 2)).join('') +
+      t(R, 352, 'Tag positions, run 1 vs run 2', 'h') + t(R + 304, 336, '★ my part', 'acct') +
+      `<rect x="${R}" y="368" width="${0.63 * 380}" height="16" class="mutef"/><rect x="${R}" y="368" width="${0.40 * 380}" height="16" class="mutef2"/>` + t(R + 0.63 * 380 + 8, 381, '0.40–0.63 m raw', 's') +
+      `<rect x="${R}" y="394" width="${0.10 * 380}" height="16" class="accf"/>` + t(R + 0.10 * 380 + 8, 407, '≤ 0.10 m after optimisation', 'b');
+    return svg(arrowDefs + left + right, 'AprilTag drone: top-down search lanes over the area with known and target tags, the PX4/ESP32/laptop system, and drift correction stages');
+  }
+
+  /* ── UREx ToF ring ── */
+  function tof() {
+    const cx = 230, cy = 225;
+    const room = 'M50 70H300V110H410V300H350V390H120V330H50Z';
+    // ray cast to room walls (approximate, piecewise by bearing)
+    const hit = b => { const a = (b - 90) * Math.PI / 180, dx = Math.cos(a), dy = Math.sin(a); let best = 1e9;
+      const segs = [[50,70,300,70],[300,70,300,110],[300,110,410,110],[410,110,410,300],[410,300,350,300],[350,300,350,390],[350,390,120,390],[120,390,120,330],[120,330,50,330],[50,330,50,70]];
+      for (const [x1,y1,x2,y2] of segs) { const ex=x2-x1, ey=y2-y1, den=dx*ey-dy*ex; if (Math.abs(den)<1e-9) continue; const tt=((x1-cx)*ey-(y1-cy)*ex)/den, u=((x1-cx)*dy-(y1-cy)*dx)/den; if (tt>0&&u>=0&&u<=1) best=Math.min(best,tt); } return best; };
+    let wedges = '', pts = '';
+    for (let i = 0; i < 8; i++) {
+      const b = i * 45, a1 = (b - 16 - 90) * Math.PI / 180, a2 = (b + 16 - 90) * Math.PI / 180;
+      const r = 150;
+      wedges += `<path d="M${cx} ${cy} L${cx + r * Math.cos(a1)} ${cy + r * Math.sin(a1)} A${r} ${r} 0 0 1 ${cx + r * Math.cos(a2)} ${cy + r * Math.sin(a2)}Z" class="wedge"/>`;
+      for (let z = -3; z <= 3; z++) { const bb = b + z * 4.5, rr = hit(bb); if (rr < 230) { const aa = (bb - 90) * Math.PI / 180; pts += `<circle cx="${(cx + rr * Math.cos(aa)).toFixed(1)}" cy="${(cy + rr * Math.sin(aa)).toFixed(1)}" r="2.4" class="accf"/>`; } }
+      const sa = (b - 90) * Math.PI / 180; wedges += `<rect x="${cx + 26 * Math.cos(sa) - 4}" y="${cy + 26 * Math.sin(sa) - 4}" width="8" height="8" class="inkf" transform="rotate(${b} ${cx + 26 * Math.cos(sa)} ${cy + 26 * Math.sin(sa)})"/>`;
+    }
+    const droneArt = `<path d="M${cx - 18} ${cy - 18}l36 36M${cx + 18} ${cy - 18}l-36 36" class="ink2"/>` + [[-18, -18], [18, -18], [-18, 18], [18, 18]].map(([a, b]) => `<circle cx="${cx + a}" cy="${cy + b}" r="9" class="ink1 bgf"/>`).join('') + `<path d="M${cx} ${cy - 40}v-14" class="ink1" marker-end="url(#ar)"/>` + t(cx + 6, cy - 50, 'nose', 's');
+    let zones = ''; for (let r = 0; r < 8; r++) for (let k = 0; k < 8; k++) zones += `<rect x="${448 + k * 9}" y="${300 + r * 9}" width="8" height="8" class="z" style="opacity:${(.15 + rnd() * .75).toFixed(2)}"/>`;
+    // pose graph (1 m square mission loop)
+    const gx = 560, gy = 70, sz = 190, nodes = [];
+    for (let i = 0; i < 16; i++) { const side = Math.floor(i / 4), f = (i % 4) / 4; let x, y;
+      if (side === 0) { x = gx + f * sz; y = gy; } else if (side === 1) { x = gx + sz; y = gy + f * sz; } else if (side === 2) { x = gx + sz - f * sz; y = gy + sz; } else { x = gx; y = gy + sz - f * sz; }
+      nodes.push([x + (rnd() - .5) * 10, y + (rnd() - .5) * 10]); }
+    let graph = nodes.map((n, i) => i ? `<path d="M${nodes[i - 1]} L${n}" class="ink2"/>` : '').join('');
+    graph += `<path d="M${nodes[15]} L${nodes[0]}" class="loop"/><path d="M${nodes[14]} L${nodes[1]}" class="loop"/>`;
+    graph += nodes.map((n, i) => `<circle cx="${n[0]}" cy="${n[1]}" r="6" class="${i === 0 ? 'accf' : 'node'}"/>`).join('');
+    const legend = `<path d="M560 300h24" class="ink2"/>` + t(590, 304, 'ICP between consecutive scans', 's') + `<path d="M560 320h24" class="loop"/>` + t(590, 324, 'loop closure', 's') + t(560, 344, 'graph holds up to 64 poses', 's');
+    const split = box(450, 378, 200, 70, 'On the drone · ESP32-S3', ['ToF capture → ICP', 'sparse pose-graph solve'], true) + `<path d="M652 413h26" class="ink1" marker-end="url(#ar)"/>` + box(680, 378, 190, 70, 'After landing · laptop', ['receive graph', 'build occupancy map']);
+    return svg(arrowDefs + `<clipPath id="rc"><path d="${room}"/></clipPath>` + t(40, 40, 'Eight VL53L5CX sensors around the drone', 'h') + t(560, 40, 'Pose graph', 'h') +
+      `<path d="${room}" class="ink3"/><g clip-path="url(#rc)">` + wedges + `</g>` + pts + droneArt + t(448, 290, 'one sensor = 8×8 zones', 's') + zones + graph + legend + split,
+      'ToF ring: eight time-of-flight sensors on a drone scanning room walls, and the pose graph optimised on the ESP32-S3');
+  }
+
+  /* ── RB2301 Bingda series ── */
+  function bingda() {
+    const panel = (x, title, sub) => `<rect x="${x}" y="60" width="270" height="300" class="ink2"/>` + t(x, 40, title, 'h') + t(x, 392, sub[0], 's') + t(x, 409, sub[1], 's');
+    // CA1
+    const cans = [[50, 110], [110, 95], [190, 120], [240, 100], [70, 170], [150, 160], [225, 185], [40, 240], [110, 225], [185, 240], [250, 260]];
+    const p1 = panel(20, 'CA1 · Reactive avoidance', ['LiDAR finds the gap between cans,', 'strafes to its midpoint, no turning']) +
+      cans.map(([a, b]) => `<circle cx="${20 + a}" cy="${b}" r="10" class="ink1 bgf"/>`).join('') +
+      [-60, -40, -20, 0, 20, 40, 60].map(a => { const r = (a - 90) * Math.PI / 180; return `<path d="M160 320 l${150 * Math.cos(r)} ${150 * Math.sin(r)}" class="ray"/>`; }).join('') +
+      `<circle cx="167.5" cy="232.5" r="5" class="accf"/><path d="M130 225h75" class="dash"/>` +
+      `<rect x="148" y="310" width="24" height="24" class="inkf"/><path d="M160 306v-18" class="w2" /><path d="M160 320 L166 242" class="acc" marker-end="url(#ara)"/>` + t(176, 296, 'strafe', 'acct');
+    // CA2
+    const X = 310; let grid = ''; for (let i = 0; i <= 9; i++) grid += `<path d="M${X + i * 30} 60v300M${X} ${60 + i * 30 + 30}h270" class="cell"/>`;
+    const walls = `<path d="M${X + 90} 60v90M${X + 180} 360V180" class="wall"/>`;
+    const stair = `<path d="M${X + 30} 330V270H${X + 60}V210H${X + 90}V180H${X + 120}V90H${X + 150}V120H${X + 180}V150H${X + 210}V180H${X + 240}V330" class="dashm"/>`;
+    const smooth = `<path d="M${X + 30} 330 L${X + 60} 240 L${X + 130} 90 L${X + 150} 120 L${X + 215} 180 L${X + 240} 330" class="acc"/>`;
+    const p2 = panel(X, 'CA2 · Planning a car-like robot', ['grid A* → simplify the path →', 'PD-steer toward a lookahead point']) + grid + walls + stair + smooth +
+      `<circle cx="${X + 60}" cy="240" r="38" class="dash"/><circle cx="${X + 84}" cy="190" r="6" class="accf"/>` + `<rect x="${X + 50}" y="252" width="20" height="28" class="inkf" transform="rotate(-18 ${X + 60} 266)"/>` + t(X + 98, 194, 'lookahead', 'acct');
+    // FP
+    const F = 600;
+    const p3 = panel(F, 'Final · Dynamic obstacle course', ['state machine: corridor → gate →', 'wait for each swinging board']) +
+      `<path d="M${F + 40} 360V250H${F + 120}M${F + 100} 360V290" class="wall"/><path d="M${F + 120} 250V200H${F + 30}V60M${F + 120} 200H${F + 160}V60" class="wall"/>` +
+      `<path d="M${F + 160} 160H${F + 270}M${F + 160} 100H${F + 270}" class="wall"/>` +
+      `<path d="M${F + 175} 160 l0 -60" class="board"/><path d="M${F + 175} 160 A60 60 0 0 1 ${F + 235} 100" class="dash"/>` +
+      `<path d="M${F + 225} 100 l0 60" class="board"/><path d="M${F + 225} 100 A60 60 0 0 0 ${F + 165} 160" class="dash"/>` +
+      t(F + 165, 182, 'board 1', 's') + t(F + 200, 92, 'board 2', 's') + `<path d="M${F + 60} 200h40" class="w2"/>` + t(F + 56, 220, 'gate', 's') +
+      `<path d="M${F + 70} 340 V270 Q${F + 70} 225 ${F + 80} 205 V150 Q${F + 80} 130 ${F + 140} 130 H${F + 255}" class="acc" marker-end="url(#ara)"/>` +
+      `<rect x="${F + 128}" y="120" width="20" height="20" class="inkf"/>` + t(F + 120, 112, 'wait', 'acct');
+    return svg(arrowDefs + p1 + p2 + p3, 'Bingda ROS series: reactive gap avoidance, A* with lookahead tracking, and the dynamic course with gate and swinging boards');
+  }
+
+  /* ── Autoencoder ── */
+  function autoenc() {
+    const tile = (x, y, mask, recon = false) => { let s = ''; for (let r = 0; r < 8; r++) for (let k = 0; k < 8; k++) { const m = mask(r, k); s += `<rect x="${x + k * 11}" y="${y + r * 11}" width="10" height="10" class="${m ? (recon ? 'accf' : 'maskf') : 'px'}" style="${m ? (recon ? 'opacity:.55' : 'opacity:1') : `opacity:${(.25 + ((r * 7 + k * 13) % 10) / 14).toFixed(2)}`}"/>`; } return s; };
+    const m1 = (r, k) => r >= 2 && r <= 4 && k >= 3 && k <= 5, m2 = (r, k) => r >= 1 && r <= 5 && k >= 2 && k <= 6, m3 = (r, k) => (r === 1 && k === 1) || (r === 2 && k === 5) || (r === 5 && k === 2) || (r === 6 && k === 6) || (r === 4 && k === 4);
+    const ins = [[m1, '10×10 square · 0.0603'], [m2, 'random 4–12 px ★ 0.0499'], [m3, '2–5 small squares · 0.0572']].map(([m, l], i) => tile(40, 70 + i * 120, m) + t(140, 114 + i * 120, l, i === 1 ? 'b s' : 's')).join('');
+    return svg(arrowDefs + t(40, 40, 'Black out part of a 32×32 CIFAR-10 image, reconstruct the original', 'h') + ins +
+      `<path d="M312 225h30" class="ink1" marker-end="url(#ar)"/><path d="M350 95 L500 175 V275 L350 355Z" class="box"/>` + t(380, 222, 'encoder', 'b') + t(372, 240, '5 conv → 64×8×8', 's') +
+      `<rect x="515" y="195" width="24" height="60" class="boxa"/>` + t(498, 290, 'latent 512', 's') +
+      `<path d="M555 175 L700 95 V355 L555 275Z" class="box"/>` + t(590, 222, 'decoder', 'b') + t(580, 240, '2 deconv → 32×32', 's') + `<path d="M710 225h30" class="ink1" marker-end="url(#ar)"/>` +
+      tile(752, 181, m2, true) + t(752, 290, 'reconstruction', 's') + t(752, 306, 'test MSE, 10k images', 's') +
+      t(60, 440, '★ lowest test MSE · numbers are test MSE (normalised scale, Adam, 20 epochs)', 'acct'),
+      'Autoencoder: three masking strategies feeding an encoder–decoder that reconstructs the image');
+  }
+
+
+  /* ── RB2301 CA1: reactive avoidance (my "max" controller) ── */
+  function ca1() {
+    const rx = 240, ry = 392;
+    let s = `<path d="M${rx - 200} ${ry} A200 200 0 0 1 ${rx + 200} ${ry}" class="dash"/>` + t(40, ry - 216, 'front scan · 0.75 m', 's');
+    s += `<rect x="${rx - 22}" y="${ry - 82}" width="44" height="66" class="accd"/>` + t(rx - 116, ry - 40, 'clear strip', 's') + t(rx - 116, ry - 26, '0.24 × 0.30 m', 's');
+    const cans = [[120, 300], [178, 214], [302, 204], [392, 282], [240, 334]];
+    cans.forEach(([x, y]) => { s += `<circle cx="${x}" cy="${y}" r="13" class="ink1 bgf"/>`; const a0 = Math.atan2(y - ry, x - rx);
+      for (let k = -2; k <= 2; k++) { const a = a0 + Math.PI + k * 0.35; s += `<circle cx="${(x + 13 * Math.cos(a)).toFixed(1)}" cy="${(y + 13 * Math.sin(a)).toFixed(1)}" r="2.2" class="accf"/>`; } });
+    const mark = (x, y, ok, label, dx = 10) => (ok ? `<circle cx="${x}" cy="${y}" r="7" class="accf"/>` : `<path d="M${x - 6} ${y - 6}l12 12m0-12l-12 12" class="ink2"/>`) + t(x + dx, y + 4, label, ok ? 'acct' : 's');
+    s += `<path d="M120 300 L178 214" class="dashm"/>` + mark(149, 257, false, 'too narrow', -82);
+    s += `<path d="M178 214 L302 204" class="dashm"/>` + mark(240, 209, false, 'path blocked', -40).replace(`y="213"`, `y="196"`);
+    s += `<path d="M302 204 L392 282" class="dashm"/>` + mark(347, 243, true, 'chosen');
+    s += `<rect x="${rx - 14}" y="${ry - 14}" width="28" height="28" class="inkf"/><path d="M${rx} ${ry - 18}v-14" class="w2"/>`;
+    s += `<path d="M${rx + 10} ${ry - 16} L340 252" class="acc" marker-end="url(#ara)"/>` + t(rx + 60, ry - 50, 'strafe, heading fixed', 'acct');
+    const R = 480, steps = [
+      ['1 · Drive', '0.3 m/s until a can enters the strip'],
+      ['2 · Cluster', 'readings ≤ 0.12 m apart become one can'],
+      ['3 · Gap test', 'fits robot + 0.33 m/side, ≤ 85°, path clear'],
+      ['4 · Pick', 'straightest gap wins, else right first'],
+      ['5 · No gap', 'sidestep 0.25 m/s toward more room; back up if boxed in'],
+      ['6 · Settle', 'hold the last command 8 scans so it doesn’t jitter']];
+    s += t(R, 40, 'My controller (max), every LiDAR scan', 'h') + steps.map((x, i) => `<rect x="${R}" y="${58 + i * 62}" width="390" height="52" rx="3" class="${i === 2 || i === 3 ? 'boxa' : 'box'}"/>` + t(R + 12, 79 + i * 62, x[0], 'b') + t(R + 12, 97 + i * 62, x[1], 's')).join('');
+    return svg(arrowDefs + t(40, 40, 'Can field, LiDAR only, no map, no turning', 'h') + s, 'CA1: robot scanning a can field, rejecting narrow or blocked gaps and strafing to the chosen gap; six-step controller logic');
+  }
+
+  /* ── RB2301 CA2: path planning ── */
+  function ca2() {
+    const c = 36, cols = 10, rows = 8, walls = [];
+    for (let r = 0; r <= 4; r++) walls.push([3, r]); for (let r = 3; r <= 7; r++) walls.push([6, r]); walls.push([8, 1], [8, 2]);
+    const isW = (k, r) => walls.some(w => w[0] === k && w[1] === r);
+    const panel = (x0, inflate) => { let s = '';
+      for (let r = 0; r < rows; r++) for (let k = 0; k < cols; k++) {
+        let cls = 'cell';
+        if (isW(k, r)) cls = 'wallc';
+        s += `<rect x="${x0 + k * c}" y="${70 + r * c}" width="${c}" height="${c}" class="${cls}"/>`; }
+      if (inflate) { const blocks = [[3, 0, 1, 5], [6, 3, 1, 5], [8, 1, 1, 2]];
+        const ring = (m, cls) => blocks.map(([k, r, w, h]) => `<rect x="${x0 + k * c - m}" y="${70 + r * c - m}" width="${w * c + 2 * m}" height="${h * c + 2 * m}" class="${cls}"/>`).join('');
+        s = s.replace(/class="wallc"/g, 'class="cell"') + `<g clip-path="url(#rc)">` + ring(16, 'softc') + ring(7, 'hardc') + ring(0, 'wallc') + `</g>`; }
+      return s; };
+    const P = (x0, k, r) => [x0 + (k + .5) * c, 70 + (r + .5) * c];
+    const L = 40, Rr = 490;
+    const astar = [[0, 7], [5, 7], [5, 2], [7, 2], [7, 0], [9, 0]].map(([k, r]) => P(L, k, r));
+    let left = panel(L, false) + `<path d="M${astar.join(' L')}" class="acc" marker-end="url(#ara)"/>` + astar.slice(1, -1).map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="5" class="inkf"/>`).join('');
+    left += `<circle cx="${astar[1][0]}" cy="${astar[1][1] - 26}" r="7" class="accf"/><circle cx="${astar[1][0]}" cy="${astar[1][1]}" r="26" class="dash"/>`;
+    left += `<circle cx="${astar[2][0] + 18}" cy="${astar[2][1]}" r="30" class="warnc"/>` + t(astar[2][0] + 54, astar[2][1] + 52, 'tight corner', 'acct');
+    let tree = ''; seed = 11; const nodes = [P(Rr, 0, 7)];
+    for (let i = 0; i < 70; i++) { const q = [Rr + 10 + rnd() * 340, 80 + rnd() * 270]; let best = nodes[0], bd = 1e9; nodes.forEach(n => { const dd = Math.hypot(n[0] - q[0], n[1] - q[1]); if (dd < bd) { bd = dd; best = n; } });
+      const st = Math.min(1, 34 / bd), nq = [best[0] + (q[0] - best[0]) * st, best[1] + (q[1] - best[1]) * st]; const k = Math.floor((nq[0] - Rr) / c), r = Math.floor((nq[1] - 70) / c);
+      const mid = [(best[0] + nq[0]) / 2, (best[1] + nq[1]) / 2], km = Math.floor((mid[0] - Rr) / c), rm = Math.floor((mid[1] - 70) / c); if (k < 0 || k >= cols || r < 0 || r >= rows || isW(k, r) || isW(km, rm)) continue; nodes.push(nq); tree += `<path d="M${best} L${nq}" class="treel"/>`; }
+    const route = [[Rr + .5 * c, 70 + 7.3 * c], [Rr + 2.6 * c, 70 + 6.4 * c], [Rr + 5 * c, 70 + 5.4 * c], [Rr + 5 * c, 70 + 2.4 * c], [Rr + 6.2 * c, 70 + 1.2 * c], [Rr + 7.6 * c, 70 + 0.45 * c], [Rr + 9.6 * c, 70 + 0.45 * c]];
+    let right = panel(Rr, true) + tree + `<path d="M${route.join(' L')}" class="acc" marker-end="url(#ara)"/>` + `<circle cx="${route[3][0]}" cy="${route[3][1] + 40}" r="7" class="accf"/><circle cx="${route[3][0]}" cy="${route[3][1] + 110}" r="70" class="dash"/>`;
+    return svg(arrowDefs + `<clipPath id="rc"><rect x="${Rr}" y="70" width="${cols * c}" height="${rows * c}"/></clipPath>` + t(L, 40, 'Final: my 4-connected grid A*', 'h') + t(Rr, 40, 'Also tested: RRT* on an inflated grid', 'h') + left + right +
+      t(L, 384, 'Manhattan A* → keep only corner cells →', 's') + t(L, 400, 'PD-steer to a 0.15 m carrot, slowing in', 's') + t(L, 416, 'turns. Free cells can sit close to walls.', 's') +
+      `<rect x="${Rr}" y="374" width="12" height="12" class="hardc"/>` + t(Rr + 18, 384, 'hard wall ring', 's') + `<rect x="${Rr + 130}" y="374" width="12" height="12" class="softc"/>` + t(Rr + 148, 384, 'soft cost ring', 's') +
+      t(Rr, 404, 'Keeps clear of walls; 0.6 m carrot; reverses', 's') + t(Rr, 420, 'when behind. Hardest goal: 3 of 5 seeds.', 's') +
+      `<circle cx="${L + 238}" cy="434" r="5" class="accf"/>` + t(L + 250, 438, 'carrot', 's') + `<circle cx="${L + 320}" cy="434" r="4" class="inkf"/>` + t(L + 330, 438, 'kept corner', 's'),
+      'CA2: my A* path hugging walls versus the team RRT* route on an inflated grid');
+  }
+
+  /* ── RB2301 Final project ── */
+  function fp() {
+    // panel 1: corridor + cones
+    const rx = 160, ry = 360; let p1 = t(40, 40, 'Front corridor + side cones', 'h');
+    for (const side of [-1, 1]) for (let j = 0; j < 6; j++) { const a0 = (side * (j * 15 + 5) - 90) * Math.PI / 180, a1 = (side * (j * 15 + 17) - 90) * Math.PI / 180, r = 150 - (j % 3) * 18;
+      p1 += `<path d="M${rx} ${ry} L${rx + r * Math.cos(a0)} ${ry + r * Math.sin(a0)} A${r} ${r} 0 0 ${side > 0 ? 1 : 0} ${rx + r * Math.cos(a1)} ${ry + r * Math.sin(a1)}Z" class="wedge"/>`; }
+    p1 += `<rect x="${rx - 19}" y="${ry - 200}" width="38" height="200" class="boxa" style="fill:none"/>` + `<rect x="${rx - 14}" y="${ry - 130}" width="34" height="22" class="inkf"/>`;
+    p1 += `<rect x="${rx - 12}" y="${ry - 12}" width="24" height="24" class="inkf"/>` + t(40, 90, '2.0 × 0.38 m corridor:', 's') + t(40, 106, 'only this triggers avoidance', 's');
+    p1 += `<path d="M${rx} ${ry - 120} Q${rx + 70} ${ry - 120} ${rx + 90} ${ry - 200}" class="acc" marker-end="url(#ara)"/>`;
+    p1 += t(40, 392, 'Turn toward the deeper side cone', 's') + t(40, 408, '(median of 15° sub-cones), +0.20 m', 's') + t(40, 424, 'bonus toward North/East; lock the turn.', 's');
+    // panel 2: gate
+    const gx = 460, gy = 150; let p2 = t(320, 40, 'Gate manoeuvre', 'h') +
+      `<path d="M330 ${gy}H${gx - 30}M${gx + 30} ${gy}H590" class="wall"/>` + t(gx + 36, gy - 10, '0.40 m gate', 's') +
+      `<path d="M350 330 Q380 260 ${gx - 40} 250" class="ink2" marker-end="url(#ar)"/><path d="M${gx - 40} 250 L${gx} 250" class="acc" marker-end="url(#ara)"/>` +
+      `<path d="M${gx + 18} 250 A18 18 0 1 0 ${gx} 268" class="ink1" marker-end="url(#ar)"/><path d="M${gx} 236 V${gy - 30}" class="acc" marker-end="url(#ara)"/>` +
+      t(352, 312, '① APPROACH', 'b') + t(gx - 70, 278, '② ALIGN', 'b') + t(gx + 26, 270, '③ TURN', 'b') + t(gx + 10, gy + 50, '④ GO', 'b') +
+      t(320, 392, 'Detect: wall ends straight & on an axis,', 's') + t(320, 408, '0.30–0.80 m apart, E–W, nothing beyond.', 's') + t(320, 424, 'Align to 2 cm, turn to 4°, go at 0.25 m/s.', 's');
+    // panel 3: boards
+    const bx = 700; let p3 = t(610, 40, 'Swinging boards', 'h') +
+      `<path d="M640 70V330M860 70V330" class="wall"/><path d="M640 170H700" class="board"/><path d="M700 170 A60 60 0 0 0 640 110" class="dash"/>` +
+      `<path d="M640 170 A60 60 0 0 1 690 140" class="dash"/>` + t(650, 196, 'board', 's') +
+      `<rect x="${bx - 12}" y="240" width="24" height="24" class="inkf"/>` + t(bx + 18, 256, 'WAIT', 'acct') + `<path d="M${bx} 236 V90" class="acc" marker-end="url(#ara)"/>` + t(bx + 10, 100, 'CROSS 0.4 m/s', 'acct') +
+      t(610, 352, 'SCAN → SIDE → FACE →', 's') + t(610, 368, 'APPROACH → WAIT → CROSS', 's') +
+      t(610, 392, 'Cross when the board is clear of the', 's') + t(610, 408, 'path and stopped, can’t swing back,', 's') + t(610, 424, 'or is moving away (last 6 s only).', 's');
+    return svg(arrowDefs + p1 + p2 + p3, 'Final project: front corridor and side cones, four-phase gate manoeuvre, and swinging-board crossing');
+  }
+
+  /* ── CDE2301 DrinkAir consultancy ── */
+  function drinkair() {
+    const X0 = 70, X1 = 430, Y0 = 330, Y1 = 80, lx = v => X0 + (Math.log10(v) - 2) / 7 * (X1 - X0), ly = p => Y0 - p / 70 * (Y0 - Y1);
+    let s = t(40, 40, 'Tech step change', 'h') + `<path d="M${X0} ${Y1 - 10}V${Y0}H${X1 + 10}" class="ink2"/>`;
+    [[1e2, '$100'], [1e4, '$10k'], [1e6, '$1M'], [1e8, '$100M']].forEach(([v, l]) => s += `<path d="M${lx(v)} ${Y0}v5" class="ink1"/>` + t(lx(v) - 14, Y0 + 18, l, 's'));
+    [0, 20, 40, 60].forEach(p => s += `<path d="M${X0 - 5} ${ly(p)}h5" class="ink1"/>` + t(X0 - 34, ly(p) + 4, p + '%', 's'));
+    s += t(X0 + 70, Y0 + 40, 'minimum upfront cost to deploy (log)', 's') + t(40, Y1 - 24, '% of production cost from external energy', 's');
+    const pt = (a, b, p, l, acc) => `<path d="M${lx(a)} ${ly(p)}H${lx(b)}" class="${acc ? 'acc' : 'ink2'}" style="stroke-width:8;stroke-linecap:round"/>` + t(lx(a), ly(p) - 12, l, acc ? 'acct' : 'b');
+    s += pt(1e8, 1.3e8, 60, 'Desalination', 0) + pt(5e3, 8e3, 50, 'Grid AWH', 0) + pt(3.5e3, 4.5e3, 15, 'Solar AWH', 0) + pt(300, 1e3, 0.6, 'Aerogel AWH (DrinkAir)', 1);
+    const R = 490, B = 40; let f = t(R, 40, 'Where to sell', 'h');
+    f += `<rect x="${R}" y="62" width="${5 * B}" height="22" class="mutef"/><rect x="${R + 5 * B}" y="62" width="${4 * B}" height="22" class="mutef2"/>` + t(R, 100, 'Market · small/mid desalination ~$5B + AWH ~$4B', 's');
+    f += `<rect x="${R}" y="116" width="${3.5 * B}" height="22" class="mutef2"/>` + t(R + 3.5 * B + 8, 132, 'Middle East & Africa ~$3.5B', 's');
+    f += `<rect x="${R}" y="152" width="${2.2 * B}" height="22" class="boxa"/>` + t(R + 2.2 * B + 8, 168, 'Saudi Arabia + UAE ~$2.2B', 'b');
+    f += `<rect x="${R}" y="188" width="${0.11 * B}" height="22" class="accf"/>` + t(R + 14, 204, 'aim: 1–5% share within 1–3 years', 'acct');
+    f += t(R, 250, 'Beachhead (BUTA screen)', 'h') +
+      [['Oil & gas', 'viable, but slow', 'and risk-averse'], ['Vertical farms', 'viable, no route', 'to governments'], ['Desert farms ★', 'subsidised,', 'lower risk']]
+        .map((b, i) => box(R + i * 128, 266, 118, 72, b[0], [b[1], b[2]], i === 2)).join('') +
+      t(R, 364, 'Sell B2G (e.g. Saudi MEWA): governments fund', 's') + t(R, 380, 'and deploy; pilots at penetration pricing, then', 's') + t(R, 396, 'value-based; maintenance bundles for the long run.', 's');
+    return svg(arrowDefs + s + f, 'DrinkAir: cost and energy comparison of water technologies, market sizing funnel, and beachhead market selection');
+  }
+
+  function placeholder() { return svg(`<rect x="40" y="40" width="820" height="380" class="dash"/>` + t(450, 236, 'Case study in progress', 'h', 'text-anchor="middle"'), 'Placeholder'); }
+
+  return { 'wave-rover': waveRover, 'apriltag-drone': drone, 'tof-ring': tof, 'rb2301-ca1': ca1, 'rb2301-ca2': ca2, 'rb2301-fp': fp, 'drinkair': drinkair, 'autoencoder': autoenc, 'placeholder': placeholder };
+})();
+
+</script>
+<script>
+'use strict';
+/* ═══════════ PROJECT DATA — edit here ═══════════
+   media: {type:'img'|'video'|'youtube', src:'…', caption:'…'}  (falls back to the schematic art)
+   Order in this array = order on the home page. */
+const PROJECTS = [
+{
+ id:'wave-rover', title:'Precision waypoint navigation on a Wave Rover',
+ gallery:[{src:'assets/img/wave-rover/01-costmap-rviz.jpg',caption:'RViz: the rover localised in our map, with its Nav2 costmap'},{src:'assets/img/wave-rover/02-robot-course.jpg',caption:'The Wave Rover on the course'},{src:'assets/img/wave-rover/03-course.png',caption:'The 6 × 4 course, cells A–X'},{src:'assets/img/wave-rover/04-map-raw.png',caption:'Raw Cartographer map'},{src:'assets/img/wave-rover/05-map-clean.png',caption:'Cleaned map used by AMCL and Nav2'},{src:'assets/img/wave-rover/slide-4.png',caption:'Our navigation stack (final presentation)'},{src:'assets/img/wave-rover/slide-9.png',caption:'Stopping on the centre of a cell'},{src:'assets/img/wave-rover/slide-11.png',caption:'Nav2’s default behaviour tree vs ours'},{src:'assets/img/wave-rover/slide-14.png',caption:'Results from the hardware runs'}],
+ short:'Wave Rover navigation', course:'RB3302 · SLAM, planning & navigation',
+ lede:'A ROS 2 / Nav2 stack that drives a physical rover to four lettered cells in order, around obstacles that were not in the map, and only counts a stop once the robot has actually settled on the cell centre.',
+ role:'Mission scripts, behaviour tree, hardware & frame debugging', team:'Team project', stack:'ROS 2 Jazzy · Nav2 · AMCL · Cartographer · EKF',
+ headline:{v:'0.7–1.9 cm',l:'final AMCL error across 5 confirmed stops'},
+ media:null, video:'assets/videos/wave-rover.mp4', videoCaption:'Hardware run on the lettered grid',
+ result:[
+  '<strong>Run 2 confirmed all four stops in order on the physical robot.</strong> Across the hardware runs, the five confirmed stops ended 0.7–1.9 cm from the target cell centre (AMCL estimate).',
+  'Cartographer built the map, an EKF fused wheel odometry and IMU, AMCL localised the rover, and Nav2 planned with A* and tracked with Regulated Pure Pursuit. On top of that I added a precision-arrival routine and a custom behaviour tree.'],
+ metrics:[{v:'4 / 4',l:'stops confirmed in Run 2'},{v:'0.7–1.9 cm',l:'final error, 5 confirmed stops'},{v:'10 cm → 2 cm',l:'Nav2 hand-off → precision-check tolerance'}],
+ pairs:[
+  {hard:'Nav2 gets you close, not centred',hd:'Nav2’s goal tolerance left the rover roughly 10 cm from the cell centre, which isn’t good enough when the task is to stop on a specific cell.',
+   how:'Approach, refine, then confirm',hw:'Nav2 hands over at 10 cm. Short correction moves follow, each with a fresh pose estimate. A stop only counts once the rover has settled and five consecutive AMCL readings agree with the target and with each other.'},
+  {hard:'The map said “arrived”, the robot clearly hadn’t',hd:'The localised pose looked on target while the chassis centre was visibly displaced on the floor. Tuning goals wouldn’t fix it, because the error was in the frames.',
+   how:'Debugged the TF tree on hardware',hw:'Traced the LiDAR, IMU and base frames on the physical robot and found that the LiDAR-to-IMU offset had the wrong sign. Flipping it made the localised pose and the real chassis line up.'},
+  {hard:'Unmapped obstacles caused re-plan thrashing',hd:'With obstacles that weren’t in the saved map, the default behaviour kept discarding a working detour in favour of a fresh plan.',
+   how:'A custom behaviour tree',hw:'I wrote a behaviour tree that keeps the current detour while it is still valid and only replans when it has to.'}],
+ limits:['Run 3 confirmed its first stop, then timed out at the second because the rover never passed the settling check, even though the last estimate was 1.4 cm away. The check was strict on purpose.','Errors are AMCL localisation estimates, not independently measured chassis positions.'],
+ links:[['Project repository','https://github.com/MaxwellGuico/SLAMRB3302'],['Hardware test log','https://github.com/MaxwellGuico/SLAMRB3302/blob/main/1_Project_Logs/Project%20Log%20-%202026-11-12.md']]
+},
+{
+ id:'apriltag-drone', title:'GPS-free AprilTag search & mapping drone',
+ gallery:[{src:'assets/img/apriltag-drone/01-search-plan.png',caption:'Planned search path over the area'},{src:'assets/img/apriltag-drone/02-lawnmower.png',caption:'Lawnmower coverage plans with yaw'},{src:'assets/img/apriltag-drone/03-experiment-plans.png',caption:'Trajectory experiments we flew'},{src:'assets/img/apriltag-drone/04-calibration.png',caption:'ChArUco corners detected during my camera calibration'}],
+ short:'AprilTag drone mapping', course:'CDE1302 · Aerial robotics',
+ lede:'An indoor drone that searches a 3.6 × 3.15 m area for three AprilTags, maps where they are relative to takeoff, and lands in a 0.9 m box, using only onboard sensing and a laptop correction loop.',
+ role:'Camera calibration · Gauss–Newton pose-graph optimisation', team:'Team project', stack:'PX4 · ESP32-S3 · MAVLink · Python · OpenCV',
+ headline:{v:'0.63 → 0.10 m',l:'tag-map disagreement before → after optimisation'},
+ media:null, video:'assets/videos/apriltag-drone.mp4', videoCaption:'Search mission: laptop log (left) and live tag detections from the drone camera (right)',
+ result:[
+  '<strong>Two flights on the final route each found 3 of 3 targets and 4 of 4 known tags.</strong> After post-flight pose-graph optimisation the tag positions from the two runs agreed to within 0.10 m, down from 0.40–0.63 m using raw flight estimates.',
+  'PX4 handled flight using optical flow and a range sensor. An ESP32-S3 bridged MAVLink and streamed camera frames over Wi-Fi to a laptop, which planned the path, detected tags, ran the correction loop and built the map.'],
+ metrics:[{v:'3 / 3',l:'targets found in each run'},{v:'0.40–0.63 m',l:'run-to-run tag disagreement, raw'},{v:'≤ 0.10 m',l:'after pose-graph optimisation'}],
+ pairs:[
+  {hard:'No GPS, and the odometry over-reads distance',hd:'Optical flow over-estimated travelled distance by about 1.1–1.25×, and that PX4 version had no flow-scale parameter to correct it. Drift built up over every flight.',
+   how:'Correct drift at three stages',hw:'In flight, a laptop PI loop nudges the drone back onto the lane at 5 Hz. Before landing, a home tag at a known position measures the drift so it can be removed. After landing, pose-graph optimisation refines every pose and tag together.'},
+  {mine:true,hard:'Tag poses from a cheap, tilted camera',hd:'Tag positions come from a 320 × 240 camera pitched 45° down, streamed at about 10 fps. Small errors in focal length or lens distortion turn straight into metres of error in the map.',
+   how:'Calibrated the camera with ChArUco',hw:'I calibrated the camera from ChArUco board photos (fx ≈ 183.3, fy ≈ 182.9, plus distortion). The firmware and the laptop detector both use those values, so tag poses (IPPE from the four corners) are consistent everywhere.'},
+  {mine:true,hard:'Live tag estimates disagreed by up to 0.63 m',hd:'Each in-flight sighting inherited whatever drift the drone had at that moment, so the same tag landed in different places across runs.',
+   how:'Gauss–Newton pose-graph optimisation',hw:'I proposed solving the map after landing. A Gauss–Newton optimiser (LSMR solver, Huber loss) fits every drone pose and tag position to every observed corner pixel (σ 0.7 px), anchored by the known tags. Run-to-run disagreement fell to ≤ 0.10 m.'},
+  {hard:'False tag IDs from a small tag family',hd:'tag16h5 has only 30 codes, so noisy low-resolution frames produced believable false detections, and distant tags gave poor poses.',
+   how:'A strict detection gate',hw:'Targets need zero bit errors and a high decision margin. Tags beyond 1.4 m are ignored unless the margin is very high. Slow turns (8°/s) on smooth arcs keep the camera steady.'}],
+ limits:['Two repeat runs on the same route. The comparison measures agreement between flights, not absolute accuracy.','If the home tag isn’t seen, landing relies on PX4 alone (0.2–0.4 m error).'],
+ links:[['Team repository','https://github.com/gayatri0303030/cde1302-uav'],['Planned search path','https://github.com/gayatri0303030/cde1302-uav/blob/main/laptop/trajectories/search_plan.png']]
+},
+{
+ id:'tof-ring', title:'SLAM on a microcontroller, in flight',
+ keepDiagram:true,
+ gallery:[{src:'assets/img/tof-ring/01-trajectory.png',caption:'Run 11 trajectory: raw PX4 odometry vs NanoSLAM-optimised, with sequential-ICP and loop-closure edges'},{src:'assets/img/tof-ring/02-map-overview.png',caption:'Run 11 occupancy maps (58 poses): PX4 poses, SLAM poses, and SLAM poses with free space cleared to 2.5 m'}],
+ short:'ToF-ring NanoSLAM', course:'UREx · Undergraduate research',
+ lede:'Can an ESP32-S3 and a ring of eight time-of-flight sensors produce the corrected poses needed to map a room, onboard a flying drone? I adapted ETH NanoSLAM to find out.',
+ role:'Independent research project', team:'Solo', stack:'ESP32-S3 · VL53L5CX ×8 · NanoSLAM · PX4',
+ headline:{v:'within 3 cm',l:'room-size agreement across four flights'},
+ media:null,
+ result:[
+  '<strong>The microcontroller ran scan matching and pose-graph optimisation during flight, and the maps came out tighter than raw odometry.</strong> In a 3 × 5 m flight, all three measured walls had 1.0–1.7 cm less point spread than with raw PX4 odometry.',
+  'Across four small-room flights, maps from the onboard optimiser and a laptop implementation gave room dimensions within 3 cm of each other.'],
+ metrics:[{v:'1.0–1.7 cm',l:'less wall-point spread vs raw PX4'},{v:'≤ 3 cm',l:'onboard vs laptop room dimensions'},{v:'8 sensors',l:'8×8-zone ToF arrays facing outward'}],
+ pairs:[
+  {hard:'Tiny sensors, tiny computer',hd:'NanoSLAM was built for a different sensor setup. Eight short-range, low-resolution ToF arrays give far sparser scans than LiDAR, and the whole pipeline had to fit in microcontroller memory and time budgets.',
+   how:'Adapt NanoSLAM, split the work',hw:'I adapted the scan model to the 8-sensor ring and kept only what needed to run in flight on the ESP32-S3: scan matching and pose-graph optimisation. Dense map reconstruction happens on a laptop after landing.'},
+  {hard:'Optimisation time grows with the graph',hd:'Near 60 poses, one optimisation pass took longer than the 2-second interval between new poses, so the optimiser could no longer keep up.',
+   how:'Measured and documented the ceiling',hw:'I profiled pass time against graph size and capped the graph at 64 poses (about two minutes of flight). That gives a clear, measured limit for future work.'}],
+ limits:['Corrected poses did not feed back into flight control.','Comparisons are against raw odometry and a laptop optimiser, not a surveyed ground-truth map.'],
+ links:[['Project repository','https://github.com/MaxwellGuico/urex-nanoslam']]
+},
+{
+ id:'rb2301-fp', title:'Crossing a dynamic obstacle course with a LiDAR state machine',
+ gallery:[{src:'assets/img/rb2301-fp/01-full-course.gif',caption:'A full-course run in the 2D simulator'},{src:'assets/img/rb2301-fp/02-all-runs.png',caption:'All 20 randomised runs (green = complete, orange = timeout)'},{src:'assets/img/rb2301-fp/corridor_extraction.png',caption:'Front corridor: only obstacles inside the rectangle count'},{src:'assets/img/rb2301-fp/side_cones.png',caption:'Side cones pick the turn direction'},{src:'assets/img/rb2301-fp/gate_detection.png',caption:'Gate test: closed line vs a gap between boxes'},{src:'assets/img/rb2301-fp/gate_manoeuvre.gif',caption:'The four-phase gate manoeuvre'},{src:'assets/img/rb2301-fp/boards.gif',caption:'Timing the swinging boards'},{src:'assets/img/rb2301-fp/heading_layers.png',caption:'Heading layers when the corridor is clear'}],
+ videos:[{src:'assets/videos/fp-real.mp4',caption:'Real run on the Bingda robot'},{src:'assets/videos/fp-gazebo.mp4',caption:'Gazebo simulation'}],
+ short:'Dynamic obstacle course', course:'RB2301 · Final project',
+ lede:'A Bingda robot crosses a course that changes every run: a zigzag corridor, dead-end pockets, a 0.40 m gate and swinging boards. No map, just LiDAR, pose and a state machine.',
+ role:'Corridor & gate logic', team:'Team project', stack:'ROS 2 Jazzy · Python · LiDAR · OptiTrack',
+ headline:{v:'17 / 20',l:'randomised courses finished, zero collisions'},
+ media:null,
+ result:[
+  '<strong>At 0.22 m/s the controller finished 17 of 20 randomised courses with no collisions.</strong> Every failure was a timeout. At 0.30 m/s it was faster (51 s vs 81 s mean) but finished only 15, so we kept the slower speed.',
+  'The decision logic is written as plain functions with no ROS code, so the same logic runs in Gazebo, in our fast 2D simulator, and on the real robot.'],
+ metrics:[{v:'17 / 20',l:'finishes at 0.22 m/s · 81 s mean'},{v:'15 / 20',l:'finishes at 0.30 m/s · 51 s mean'},{v:'0',l:'collisions in either setting'}],
+ pairs:[
+  {hard:'Swerving at things beside the path',hd:'Early versions reacted to anything in the scan, so the robot dodged walls and boxes it was never going to hit, then oscillated.',
+   how:'A front corridor and a turn lock',hw:'Only obstacles inside a 2.0 × 0.38 m corridor straight ahead trigger avoidance. The robot turns toward the deeper side cone and holds that turn until the obstacle has left the corridor.'},
+  {mine:true,hard:'Gaps between cylinders looked like the gate',hd:'Any opening of about the right width passed as the 0.40 m gate, sending the robot into dead ends.',
+   how:'Strict geometric gate test + 4-phase manoeuvre',hw:'Both wall ends must be straight runs lying on a world axis, 0.30–0.80 m apart, roughly East–West, with nothing just beyond. Then APPROACH → ALIGN (2 cm) → TURN (4°) → GO.'},
+  {hard:'Boards swing too long to just wait out',hd:'A swinging board decays slowly, so waiting for it to stop wasted most of the time limit.',
+   how:'Time the crossing',hw:'Track the board, use only its last 6 s of motion, and cross as soon as it is clear of the path and stopped, can’t swing back into the path, or is moving away.'},
+  {hard:'Faster made it worse',hd:'At 0.30 m/s the robot got caught circling near narrow openings in two extra runs.',
+   how:'Choose speed by measurement',hw:'We ran the same 20 seeds at both speeds and kept the setting with the better completion rate, not the better best-case time.'}],
+ limits:['Completion counts are from the 2D simulator with hand-swung boards. Hardware was tested separately, so these are not hardware success rates.','Remaining timeouts were slow orbits: beside a cylinder near the start, in the start room, and at the corner where the course turns south.'],
+ links:[['Final-project design notes','https://github.com/Lynean/rb2301/blob/main/FP.md'],['Team repository','https://github.com/Lynean/rb2301']]
+},
+{
+ id:'rb2301-ca2', title:'Planning routes a car-like robot can actually drive',
+ videos:[{src:'assets/videos/ca2-real.mp4',caption:'CA2 run on the Bingda robot'}],
+ gallery:[{src:'assets/img/rb2301-ca2/01-astar-paths.png',caption:'My A* paths to the four goals, as run (green = planned path)'},{src:'assets/img/rb2301-ca2/02-rrt-tree.png',caption:'RRT* tree on the maze (alternative we tested)'},{src:'assets/img/rb2301-ca2/03-rrt-planner.png',caption:'RRT* on the inflated map'},{src:'assets/img/rb2301-ca2/04-carrot.png',caption:'Car-like carrot tracking in the RRT* version'}],
+ short:'Path planning in a maze', course:'RB2301 · CA2',
+ figs:[{src:'assets/img/ca2-paths.jpg',caption:'Actual planned paths used on the maze'}],
+ lede:'Reach a list of goals in a known maze without touching a wall, driving like a car: forward, reverse and turning only. My A* planner and PD tracker were used in the final run; we also tested an RRT* alternative.',
+ role:'A* planner + PD path tracker (used in the final)', team:'Team project', stack:'ROS 2 · Python · OptiTrack',
+ headline:{v:'A*',l:'my planner, chosen for the final run over RRT*'},
+ media:null,
+ result:[
+  '<strong>The final run used my grid A* planner and PD path tracker.</strong> It plans on the 0.2 m occupancy grid, keeps only the corner waypoints, and steers toward a carrot point that moves along the path.',
+  'We also built and tested an RRT* planner on an inflated, upsampled map with car-like tracking that reverses when the target is behind. It worked in a seeded demo, but A* is what we ran.'],
+ metrics:[{v:'0.2 m',l:'grid cell size'},{v:'0.15 m',l:'carrot lookahead along the path'},{v:'0.05 m',l:'goal tolerance in x and y'}],
+ pairs:[
+  {mine:true,hard:'Turn an occupancy grid into a drivable route',hd:'The robot needs a short list of waypoints it can follow smoothly, not a staircase of grid cells.',
+   how:'A*, corner-only waypoints, carrot + PD',hw:'4-connected A* with a Manhattan heuristic, then keep only the cells where the direction changes. The robot chases a carrot point ahead on the path, with PD control on distance and heading, and slows as heading error grows (speed scaled by cos of the error).'},
+  {mine:true,hard:'A free path isn’t always a comfortable one',hd:'A route through free cells doesn’t guarantee the room a car-like robot needs to take every corner cleanly.',
+   how:'Smooth, slow-in-turns tracking',hw:'Following corner waypoints with a moving carrot, and cutting speed when the heading error is large, let the robot take those corners without strafing.'},
+  {hard:'Would a sampling planner do better?',hd:'We wanted to check whether planning with explicit wall clearance would beat grid A*.',
+   how:'Built and tested RRT* as an alternative',hw:'A 2,000-node RRT* on a 4× upsampled map with hard and soft wall rings, a 0.6 m carrot and a 0.25 m turning radius. Its hardest goal, behind a one-cell corridor, was reached in only 3 of 5 random seeds, so A* stayed as the final planner.'}],
+ limits:['The A* and RRT* versions were tested separately, not head-to-head on the same runs.'],
+ links:[['My A* + tracker code','https://github.com/MaxwellGuico/RobotProgrammingRB2301/blob/main/src/rb2301_ca2/rb2301_ca2/path_planning.py'],['Team CA2 notes (RRT*)','https://github.com/Lynean/rb2301/blob/main/CA2.md']]
+},
+{
+ id:'rb2301-ca1', title:'Threading a can field with LiDAR alone',
+ gallery:[{src:'assets/img/rb2301-ca1/01-gap-decision.jpg',caption:'My controller’s gap decision: clustered cans, candidate gaps, chosen midpoint'},{src:'assets/img/rb2301-ca1/02-controllers.png',caption:'Both team controllers at the same spot (mine, “max”, on the right)'}],
+ videos:[{src:'assets/videos/ca1-real.mp4',caption:'Real-robot test'},{src:'assets/videos/ca1-sim.mp4',caption:'Gazebo simulation'}],
+ short:'Reactive LiDAR avoidance', course:'RB2301 · CA1',
+ lede:'Cross a random field of cans to a finish line using only LiDAR: no map, no pose, and the robot never turns. I wrote one of the team’s two interchangeable controllers.',
+ role:'The “max” controller', team:'Team project (2 controllers)', stack:'ROS 2 · Gazebo · Python · LiDAR',
+ headline:{v:'0 turns',l:'steers purely by strafing through gaps'},
+ media:null,
+ result:[
+  '<strong>My controller crosses the can field by sliding between cans while holding a fixed heading.</strong> It only looks at the front half of the scan, out to 0.75 m, and threads the gap between neighbouring cans.',
+  'Both controllers live in one package and switch with a ROS parameter. A fixed random seed lets them be compared on the same layout, with a grader that logs time and path length.'],
+ metrics:[{v:'20 Hz',l:'control loop'},{v:'0.33 m',l:'safety margin each side of a gap'},{v:'0.75 m',l:'front scan range considered'}],
+ pairs:[
+  {mine:true,hard:'Hundreds of LiDAR points, but which cans form a gap?',hd:'Raw scan points don’t say where one can ends and the next begins, or whether the robot fits between them.',
+   how:'Cluster, then test gaps geometrically',hw:'Readings within 0.12 m of each other become one can. A gap counts only if it fits the robot plus 0.33 m on each side, lies within 85° of straight ahead, and the strip the body sweeps on the way is clear.'},
+  {mine:true,hard:'Sometimes there is no safe gap',hd:'Dense clusters leave no opening wide enough, and pushing forward means touching a can.',
+   how:'Sidestep, switch, or back up',hw:'The robot slides toward the side with more room (by median range). It switches sides if blocked close by, and backs up if both sides are blocked or a can is within 0.20 m.'},
+  {mine:true,hard:'Jittering between choices',hd:'Scan noise made the preferred side flip every few frames, so the robot twitched in place.',
+   how:'Hysteresis',hw:'It keeps its chosen side unless the other is clearly better, and holds the last avoidance command for 8 scans after the front clears.'}],
+ limits:['No timed comparison between the two controllers is published yet.'],
+ links:[['Team CA1 notes','https://github.com/Lynean/rb2301/blob/main/CA1.md'],['Team repository','https://github.com/Lynean/rb2301']]
+},
+{
+ id:'drinkair', title:'DrinkAir: taking an aerogel water harvester to market',
+ gallery:[{src:'assets/img/drinkair/slide-10.jpg',caption:'Tech step changes: where aerogel harvesting sits'},{src:'assets/img/drinkair/slide-04.jpg',caption:'The water harvesting process'},{src:'assets/img/drinkair/slide-11.jpg',caption:'Tech step change data'},{src:'assets/img/drinkair/slide-13.jpg',caption:'Future reality tree'},{src:'assets/img/drinkair/slide-27.jpg',caption:'Competitive positioning'},{src:'assets/img/drinkair/slide-51.jpg',caption:'DrinkAir’s business model canvas'},{src:'assets/img/drinkair/slide-57.jpg',caption:'BUTA: desert agriculture, our beachhead'},{src:'assets/img/drinkair/slide-54.jpg',caption:'RAMP: how we expand from the beachhead'}],
+ short:'DrinkAir consultancy', course:'CDE2301 · Product viability',
+ lede:'A consultancy study for an atmospheric water harvester built on aerogel: is the technology a real step change, who pays, which market comes first, and how should it be priced?',
+ role:'Group 5 member', team:'Group project', stack:'JTBD · PESTLE · Porter’s 5 Forces · BMC · BUTA · RAMP',
+ headline:{v:'~$2.2B',l:'Saudi + UAE target market, 1–5% share goal'},
+ media:null,
+ result:[
+  '<strong>We recommended selling to governments first, starting with subsidised desert agriculture in Saudi Arabia and the UAE</strong>, a ~$2.2B market, aiming for 1–5% share within 1–3 years.',
+  'The deck covers value proposition (jobs-to-be-done, reality trees, value canvas), industry analysis (market sizing, PESTLE, Porter’s 5 Forces), competitor business models (Watergen, SOURCE hydropanels, WaHa), pricing and go-to-market.'],
+ metrics:[{v:'0%',l:'production cost from external energy (vs 15–60%)'},{v:'$300–1k',l:'minimum upfront cost to deploy'},{v:'5–6 g/g',l:'water held per gram of aerogel (vs 0.15–0.44)'}],
+ pairs:[
+  {hard:'The users can’t be the buyers',hd:'The people who need water most, in remote and arid communities, can’t afford deep-tech hardware, and installation needs land, water-standard and regulatory approvals.',
+   how:'Sell B2G',hw:'Governments buy and deploy, with agencies like Saudi Arabia’s Ministry of Environment, Water and Agriculture as first targets. NGO and UN procurement channels cover communities governments don’t reach.'},
+  {hard:'Is it actually better, or just new?',hd:'Water harvesters already exist, and the industry faces a high threat from substitutes and innovation-led disruption.',
+   how:'Compare on deployment cost, energy and materials',hw:'Desalination needs $100M+ upfront with ~60% of production cost from energy, grid harvesters $5–8k and ~50%, solar ones $3.5k+ and ~15%. Aerogel units need $300–1k upfront, no external energy, and about $2 of aerogel per m².'},
+  {hard:'Which market first?',hd:'Several markets have budget and urgency, but a bad beachhead can stall a hardware startup.',
+   how:'BUTA screen across three markets',hw:'Remote oil & gas is viable but slow and risk-averse. Vertical farms are viable but don’t lead to government buyers. Subsidised desert agriculture has budget, urgency and lower risk if a pilot fails, so it became the beachhead, with RAMP mapping the expansion after it.'},
+  {hard:'Governments are slow to trust new tech',hd:'An unproven material makes buyers hesitant, and price per litre must beat existing water sources.',
+   how:'Pilot cheap, then capture value',hw:'Penetration pricing for pilots to build proof, value-based pricing once established, and bundled maintenance contracts projected to bring in a third or more of revenue after year five.'}],
+ limits:['A concept-stage business case. Market sizes and aerogel performance come from secondary sources, not our own tests.','The deck’s press release and testimonials were a hypothetical working-backwards exercise, so they are left out here.'],
+ links:[]
+},
+{
+ id:'autoencoder', title:'Image in-painting with a convolutional autoencoder', short:'CIFAR-10 autoencoder', course:'Machine learning · PyTorch',
+ gallery:[{src:'assets/img/autoencoder/03-reconstructions.png',caption:'Test reconstructions, random-size mask model'},{src:'assets/img/autoencoder/02-masked-unmasked.png',caption:'Masked inputs and their clean targets'},{src:'assets/img/autoencoder/04-loss.png',caption:'Training and validation loss'}],
+ lede:'A convolutional autoencoder that fills in blacked-out regions of 32 × 32 CIFAR-10 images. I compared how masking strategy, optimiser and latent size change reconstruction quality.',
+ role:'Solo', team:'Solo', stack:'PyTorch · CIFAR-10 · CNN autoencoder',
+ headline:{v:'0.0499',l:'test MSE with random-size masks, best of three'},
+ media:null,
+ result:['<strong>Training with randomly sized masks gave the lowest test error: 0.0499 MSE on the 10,000-image test set</strong>, against 0.0603 for a fixed 10 × 10 mask and 0.0572 for several small masks.',
+  'Five conv layers compress the image to 64 × 8 × 8, then to a 512-d latent vector. Two transposed convolutions bring it back to 32 × 32 × 3. All three runs used Adam for 20 epochs.'],
+ metrics:[{v:'0.0499',l:'random 4–12 px square'},{v:'0.0572',l:'2–5 small squares'},{v:'0.0603',l:'fixed 10 × 10 square (baseline)'}],
+ pairs:[
+  {hard:'One mask size teaches one trick',hd:'Trained only on a fixed 10 × 10 hole, the model learns to fill exactly that kind of gap.',
+   how:'Randomise the occlusion',hw:'Varying the square from 4 × 4 to 12 × 12 at random positions forced a more general representation, and it beat the baseline on held-out data. Multiple small masks showed the model can also fill gaps that aren’t connected.'},
+  {hard:'AdamW didn’t converge',hd:'Switching to AdamW at the standard learning rate left test MSE stuck near 0.98, effectively no learning.',
+   how:'Treat it as a tuning finding',hw:'I kept Adam for the comparison and recorded that weight decay and learning-rate scheduling need tuning for this architecture before AdamW is competitive.'}],
+ limits:['A comparison within this experiment: one run per configuration, MSE on the normalised scale.'],
+ links:[['Code, notebooks & results','https://github.com/MaxwellGuico/ConvAutoEncoder-CIFAR-10']]
+}
+];
+
+const $ = id => document.getElementById(id);
+const art = p => (DG[p.id]||DG['placeholder'])();
+function media(p){
+  const m=p.media; if(!m) return art(p);
+  if(m.type==='video') return '<video src="'+m.src+'" autoplay muted loop playsinline></video>';
+  if(m.type==='youtube') return '<iframe src="https://www.youtube-nocookie.com/embed/'+m.src+'" style="width:100%;aspect-ratio:16/9;border:0" allowfullscreen title="'+p.short+' demo"></iframe>';
+  return '<img src="'+m.src+'" alt="'+(m.caption||p.short)+'" loading="lazy" onerror="this.closest(\'figure\').hidden=true">';
+}
+function card(p){
+  return '<a class="card" href="#'+p.id+'"><div class="media">'+(p.gallery?'<img src="'+p.gallery[0].src+'" alt="">':art(p))+(p.wip?'<span class="badge">In progress</span>':'')+'</div>'+
+   '<div class="body"><span class="num"></span><span class="meta">'+p.course+'</span><h3>'+p.short+'</h3><p>'+p.lede+'</p>'+
+   '<div class="result"><b>'+p.headline.v+'</b><span>'+p.headline.l+'</span></div></div></a>';
+}
+function caseStudy(p){
+  const i=PROJECTS.indexOf(p), prev=PROJECTS[(i+PROJECTS.length-1)%PROJECTS.length], next=PROJECTS[(i+1)%PROJECTS.length];
+  let h='<a class="back" href="#work">← All projects</a><header class="case-hero"><p class="eyebrow">'+p.course+'</p><h1 tabindex="-1">'+p.title+'</h1><p class="lede">'+p.lede+'</p></header>';
+  h+='<dl class="facts"><div><dt>My role</dt><dd>'+p.role+'</dd></div><div><dt>Team</dt><dd>'+p.team+'</dd></div><div><dt>Stack</dt><dd>'+p.stack+'</dd></div></dl>';
+  if(p.figs) h+='<div class="figs">'+p.figs.map(f=>'<figure class="figure fig-real"><img src="'+f.src+'" alt="'+f.caption+'" onerror="this.parentNode.hidden=true"><figcaption class="caption">'+f.caption+'</figcaption></figure>').join('')+'</div>';
+  if(p.gallery) h+='<div class="gallery'+(p.gallery.length<=2?' wide':'')+'">'+p.gallery.map(g=>'<figure><img src="'+g.src+'" alt="'+g.caption+'" loading="lazy"><figcaption>'+g.caption+'</figcaption></figure>').join('')+'</div>';
+  if(!p.gallery||p.keepDiagram) h+=(p.gallery?'<div style="height:16px"></div>':'')+'<figure class="figure" style="margin:0">'+art(p)+'</figure><p class="caption">How it works: diagram based on the project repository. Positions are illustrative, not measured.</p>';
+  if(!p.result){h+='<div class="block"><p class="todo">This case study is still being written.</p></div>';}
+  else{
+    h+='<section class="block"><div class="block-label"><span class="n">01</span><h2>The result</h2></div>'+(p.videos?'<div class="vids">'+p.videos.map(v=>'<figure><video src="'+v.src+'" controls muted playsinline preload="metadata"></video><figcaption>'+v.caption+'</figcaption></figure>').join('')+'</div>':'')+(p.video?'<figure class="video" hidden><video src="'+p.video+'" controls muted playsinline preload="metadata" onloadedmetadata="this.parentNode.hidden=false"></video>'+(p.videoCaption?'<figcaption class="caption">'+p.videoCaption+'</figcaption>':'')+'</figure>':'')+(p.media?'<figure class="figure video" style="margin:0 0 22px">'+media(p)+'<figcaption class="caption" style="padding:0 0 8px 0">'+(p.media.caption||'')+'</figcaption></figure>':'')+'<div class="result-grid"><div class="result-text">'+p.result.map(x=>'<p>'+x+'</p>').join('')+'</div><div class="metrics">'+p.metrics.map(m=>'<div class="metric"><b>'+m.v+'</b><span>'+m.l+'</span></div>').join('')+'</div></div></section>';
+    if(p.pairs.length) h+='<section class="block"><div class="block-label"><span class="n">02</span><h2>What was hard, and how we solved it</h2></div><div class="pairs">'+p.pairs.map(x=>'<article class="pair"><div class="hard"><span class="tag">Problem'+(x.mine?'<span class="mine">My part</span>':'')+'</span><h3>'+x.hard+'</h3><p>'+x.hd+'</p></div><div class="how"><span class="tag">Solution</span><h3>'+x.how+'</h3><p>'+x.hw+'</p></div></article>').join('')+'</div></section>';
+    if(p.limits&&p.limits.length) h+='<section class="block"><div class="block-label"><span class="n">0'+(p.pairs.length?3:2)+'</span><h2>Honest limits</h2></div><ul class="limits">'+p.limits.map(x=>'<li>'+x+'</li>').join('')+'</ul></section>';
+  }
+  if(p.links&&p.links.length) h+='<div class="links">'+p.links.map(l=>'<a class="btn" href="'+l[1]+'">'+l[0]+' ↗</a>').join('')+'</div>';
+  h+='<nav class="case-nav" aria-label="More projects"><a href="#'+prev.id+'"><small>← Previous</small><span>'+prev.short+'</span></a><a href="#'+next.id+'" style="text-align:right"><small>Next →</small><span>'+next.short+'</span></a></nav>';
+  return '<article class="case">'+h+'</article>';
+}
+function route(){
+  const k=location.hash.replace(/^#\/?/,''), p=PROJECTS.find(x=>x.id===k);
+  $('home').hidden=!!p; $('case').hidden=!p;
+  if(p){$('case').innerHTML=caseStudy(p);document.title=p.short+' · Maxwell Guico';window.scrollTo(0,0);$('case').querySelector('h1').focus({preventScroll:true});}
+  else{document.title='Maxwell Guico · Robotics Engineer';if(k&&$(k))$(k).scrollIntoView();}
+}
+$('grid').innerHTML=PROJECTS.map(card).join('');
+window.addEventListener('hashchange',route); route();
+document.addEventListener('click',e=>{const lb=document.querySelector('.lightbox');if(lb){lb.remove();return;}
+  const im=e.target.closest('.gallery img');if(!im)return;
+  const d=document.createElement('div');d.className='lightbox';d.innerHTML='<img src="'+im.src+'" alt=""><p>'+im.alt+'</p>';document.body.appendChild(d);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const lb=document.querySelector('.lightbox');if(lb)lb.remove();}});
+
+</script>
+</body>
+</html>
